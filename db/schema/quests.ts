@@ -46,6 +46,13 @@ export const questsRelations = relations(quests, ({ many }) => ({
   userQuestProgress: many(userQuestProgress),
 }))
 
+export const redeemedTransactions = pgTable('redeemed_transactions', {
+  txHash: text('tx_hash').primaryKey(),
+  userId: text('user_id').notNull().references(() => userProgress.userId),
+  itemId: integer('item_id').notNull(),
+  redeemedAt: timestamp('redeemed_at').defaultNow(),
+});
+
 export const userQuestProgressRelations = relations(
   userQuestProgress,
   ({ one }) => ({

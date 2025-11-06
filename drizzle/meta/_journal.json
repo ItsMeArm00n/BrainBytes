@@ -15,6 +15,13 @@
       "when": 1762440719590,
       "tag": "0001_clever_jack_flag",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1762447445680,
+      "tag": "0002_amusing_the_executioner",
+      "breakpoints": true
     }
   ]
 }

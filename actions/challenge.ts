@@ -3,7 +3,8 @@
 import { auth } from '@clerk/nextjs/server'
 import { and, eq, sql } from 'drizzle-orm'
 import { revalidatePath, revalidateTag } from 'next/cache'
-
+import { byteTokenContract, B_DECIMALS } from '@/lib/ethers'
+import { ethers } from 'ethers'
 import { db } from '@/db/drizzle'
 import {
   challengeProgress as challengeProgressSchema,
@@ -17,12 +18,21 @@ import {
 } from '@/actions/quest'
 
 const POINTS_PER_CHALLENGE = 10
+const TOKENS_PER_CHALLENGE = 5;
 
 export async function upsertChallengeProgress(challengeId: number) {
   const { userId } = await auth()
 
   if (!userId) {
     throw new Error('Unauthorized')
+  }
+
+  const currentUserProgress = await db.query.userProgress.findFirst({
+    where: eq(userProgress.userId, userId),
+  });
+
+  if (!currentUserProgress) {
+    throw new Error('User progress not found');
   }
 
   const existingProgress = await db.query.challengeProgress.findFirst({
@@ -72,10 +82,20 @@ export async function upsertChallengeProgress(challengeId: number) {
       })
       .where(eq(userProgress.userId, userId))
 
+    if (currentUserProgress.walletAddress) {
+      try {
+        const amount = ethers.parseUnits(TOKENS_PER_CHALLENGE.toString(), B_DECIMALS);
+        const tx = await byteTokenContract.mint(currentUserProgress.walletAddress, amount);
+        console.log(`Minting ${TOKENS_PER_CHALLENGE} BYTE to ${currentUserProgress.walletAddress}, tx: ${tx.hash}`);
+      } catch (error) {
+        console.error("Failed to mint BYTE tokens:", error);
+      }
+    }
+
     await updateQuestProgress(userId, 'progress', 1)
 
     const lessonChallenges = await db.query.challenges.findMany({
-      where: eq(challenges.lessonId, challenge.lessonId), // Now 'challenges' is defined
+      where: eq(challenges.lessonId, challenge.lessonId),
       with: {
         challengeProgress: {
           where: and(

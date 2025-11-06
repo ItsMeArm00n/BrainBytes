@@ -6,7 +6,7 @@ import { Toaster } from '@/components/ui/sonner'
 import { ExitModal } from '@/components/modals/exit-modal'
 import { HeartsModal } from '@/components/modals/hearts-modal'
 import { PracticeModal } from '@/components/modals/practice-modal'
-
+import { AppProviders } from '@/components/providers'
 import { sharedMetadata } from '@/config/metadata'
 
 import { fonts } from '@/styles/fonts'
@@ -41,11 +41,13 @@ export default function RootLayout({
       <html lang="en" suppressHydrationWarning>
         <body className={`${fonts} flex flex-col font-sans`}>
           <ThemeProvider attribute="class" enableSystem disableTransitionOnChange>
-            <ExitModal />
-            <HeartsModal />
-            <PracticeModal />
-            {children}
-            <Toaster position="top-right" richColors />
+            <AppProviders>
+              <ExitModal />
+              <HeartsModal />
+              <PracticeModal />
+              {children}
+              <Toaster position="top-right" richColors />
+            </AppProviders>
           </ThemeProvider>
           <Analytics />
         </body>

@@ -4,6 +4,7 @@ import { ShoppingBag } from 'lucide-react'
 import { ShopGrid } from '@/components/user/shop/ShopGrid'
 import { getUserProgress } from '@/db/queries/userProgress'
 import { SHOP_ITEMS } from '@/config/shop'
+import { WalletManager } from '@/components/user/ConnectWalletButton'
 
 export default async function Shop() {
   const { userId } = await auth()
@@ -24,11 +25,13 @@ export default async function Shop() {
         <ShoppingBag className="size-8 text-primary" />
         <div>
           <h1 className="text-3xl font-bold">Shop</h1>
-          <p className="text-muted-foreground">Exchange your points for hearts and boosts!</p>
+          <p className="text-muted-foreground">
+            Exchange your points and tokens for hearts and vouchers!
+          </p>
         </div>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-3">
+      <div className="grid gap-4 sm:grid-cols-4"> {/* <-- Changed to 4 cols */}
         <div className="rounded-lg border-2 bg-card p-4 text-center">
           <p className="text-sm text-muted-foreground">Hearts</p>
           <p className="text-3xl font-bold text-rose-500">❤️ {userProgress.hearts}</p>
@@ -40,6 +43,9 @@ export default async function Shop() {
         <div className="rounded-lg border-2 bg-card p-4 text-center">
           <p className="text-sm text-muted-foreground">Gems</p>
           <p className="text-3xl font-bold text-secondary">💎 {userProgress.gems}</p>
+        </div>
+=        <div className="sm:col-span-1">
+          <WalletManager savedWalletAddress={userProgress.walletAddress || null} />
         </div>
       </div>
 
