@@ -45,7 +45,7 @@ export async function selectCourse(courseId: number) {
 
     const selection = {
       activeCourseId: courseId,
-      userName: user.firstName || 'User',
+      userName: user.firstName || user.username || 'User',
       userImgSrc: user.imageUrl || '/logo.svg',
     }
 

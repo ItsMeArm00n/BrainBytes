@@ -1,6 +1,6 @@
 'use server'
 
-import { auth } from '@clerk/nextjs/server'
+import { auth, currentUser } from '@clerk/nextjs/server'
 import { and, eq, sql } from 'drizzle-orm'
 import { revalidatePath, revalidateTag } from 'next/cache'
 import { byteTokenContract, B_DECIMALS } from '@/lib/ethers'
@@ -39,6 +39,9 @@ export async function upsertChallengeProgress(challengeId: number) {
   if (!currentUserProgress) {
     console.log('[upsertChallengeProgress] Creating user progress for user:', userId)
     
+    // Get the current user from Clerk to populate name and image
+    const user = await currentUser()
+    
     // Get the first available course
     const firstCourse = await db.query.courses.findFirst()
     
@@ -49,8 +52,8 @@ export async function upsertChallengeProgress(challengeId: number) {
     await db.insert(userProgress).values({
       userId,
       activeCourseId: firstCourse.id,
-      userName: 'User',
-      userImgSrc: '/logo.svg',
+      userName: user?.firstName || user?.username || 'User',
+      userImgSrc: user?.imageUrl || '/logo.svg',
     })
 
     currentUserProgress = await db.query.userProgress.findFirst({
