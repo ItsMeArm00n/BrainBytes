@@ -67,12 +67,13 @@ export function ShopItemCard({ item, hearts, points, gems }: ShopItemCardProps) 
           const contract = new ethers.Contract(BYTE_TOKEN_ADDRESS, byteTokenAbi, signer);
           
           const amount = ethers.parseUnits(item.byteCost!.toString(), B_DECIMALS);
-
+          console.log("Amount:",amount);
           toast.loading("Please approve the transaction in your wallet...");
           const tx = await contract.transfer(SHOP_WALLET_ADDRESS, amount);
           
           toast.loading("Processing transaction...");
           await tx.wait(); 
+          console.log("TX:",tx);
 
           const result = await verifyRedemption(item.id, tx.hash);
 
