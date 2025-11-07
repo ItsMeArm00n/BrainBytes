@@ -27,12 +27,39 @@ export async function upsertChallengeProgress(challengeId: number) {
     throw new Error('Unauthorized')
   }
 
-  const currentUserProgress = await db.query.userProgress.findFirst({
+  console.log('[upsertChallengeProgress] Starting for challenge:', challengeId, 'user:', userId)
+
+  let currentUserProgress = await db.query.userProgress.findFirst({
     where: eq(userProgress.userId, userId),
   });
 
+  console.log('[upsertChallengeProgress] Current user progress:', currentUserProgress)
+
+  // If user progress doesn't exist, create a default one
   if (!currentUserProgress) {
-    throw new Error('User progress not found');
+    console.log('[upsertChallengeProgress] Creating user progress for user:', userId)
+    
+    // Get the first available course
+    const firstCourse = await db.query.courses.findFirst()
+    
+    if (!firstCourse) {
+      throw new Error('No courses available')
+    }
+
+    await db.insert(userProgress).values({
+      userId,
+      activeCourseId: firstCourse.id,
+      userName: 'User',
+      userImgSrc: '/logo.svg',
+    })
+
+    currentUserProgress = await db.query.userProgress.findFirst({
+      where: eq(userProgress.userId, userId),
+    })
+
+    if (!currentUserProgress) {
+      throw new Error('Failed to create user progress')
+    }
   }
 
   const existingProgress = await db.query.challengeProgress.findFirst({
@@ -42,8 +69,10 @@ export async function upsertChallengeProgress(challengeId: number) {
     ),
   })
 
+  console.log('[upsertChallengeProgress] Existing progress:', existingProgress)
+
   const challenge = await db.query.challenges.findFirst({
-    where: eq(challengeProgressSchema.challengeId, challengeId),
+    where: eq(challenges.id, challengeId),
     columns: {
       lessonId: true,
     },
@@ -57,9 +86,11 @@ export async function upsertChallengeProgress(challengeId: number) {
 
   if (existingProgress) {
     if (isCompleted) {
+      console.log('[upsertChallengeProgress] Challenge already completed')
       return { error: 'already_completed' }
     }
 
+    console.log('[upsertChallengeProgress] Updating existing progress')
     await db
       .update(challengeProgressSchema)
       .set({
@@ -67,6 +98,7 @@ export async function upsertChallengeProgress(challengeId: number) {
       })
       .where(eq(challengeProgressSchema.id, existingProgress.id))
   } else {
+    console.log('[upsertChallengeProgress] Creating new progress')
     await db.insert(challengeProgressSchema).values({
       userId,
       challengeId,
@@ -78,6 +110,8 @@ export async function upsertChallengeProgress(challengeId: number) {
     const currentPoints = currentUserProgress.points
     const newPoints = currentPoints + POINTS_PER_CHALLENGE
     const newLevelData = getLevelFromPoints(newPoints)
+
+    console.log('[upsertChallengeProgress] Updating user progress - points:', newPoints, 'level:', newLevelData.level)
 
     await db
       .update(userProgress)
@@ -123,6 +157,7 @@ export async function upsertChallengeProgress(challengeId: number) {
     await checkMilestoneQuests(userId)
   }
 
+  console.log('[upsertChallengeProgress] Revalidating paths and tags')
   revalidateTag(`get_user_progress::${userId}`)
   revalidateTag('get_user_progress')
   revalidatePath('/learn')
@@ -130,6 +165,7 @@ export async function upsertChallengeProgress(challengeId: number) {
   revalidateTag(`get_lesson`)
   revalidateTag(`get_quests::${userId}`) 
 
+  console.log('[upsertChallengeProgress] Success!')
   return { success: true }
 }
 
