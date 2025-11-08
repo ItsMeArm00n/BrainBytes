@@ -64,35 +64,11 @@ export function CompetitionRoom({ challenge }: Props) {
     };
   }, [challenge.id, status, error]);
 
-
-  useEffect(() => {
-    if (status === 'idle' && challenge.id && !error) {
-      setStatus('waiting');
-      toast.loading('Finding an opponent...');
-      findOrJoinMatch(challenge.id)
-        .then((result:any) => {
-          setMatch(result.match);
-          if (result.status === 'joined') {
-            setStatus('in_progress');
-            toast.success('Opponent found! The match has started.');
-          } else {
-            setStatus('waiting');
-            toast.dismiss();
-            toast('Waiting for an opponent to join...');
-          }
-        })
-        .catch((err:any) => {
-          toast.error(err.message);
-          setError(err.message);
-        });
-    }
-  }, [status, challenge.id, error]);
-
   useEffect(() => {
     if (!match?.id || !userId) return;
 
     const pusherClient = new Pusher(process.env.NEXT_PUBLIC_PUSHER_APP_KEY!, {
-      cluster: process.env.PUSHER_CLUSTER!,
+      cluster: process.env.NEXT_PUBLIC_PUSHER_CLUSTER!,
       authEndpoint: '/api/pusher/auth',
     });
 

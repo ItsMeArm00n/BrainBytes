@@ -3,7 +3,7 @@
 import { auth } from '@clerk/nextjs/server'
 import { db } from '@/db/drizzle'
 import { challengeMatches, userProgress } from '@/db/schema'
-import { and, eq, isNull, sql } from 'drizzle-orm'
+import { and, eq, isNull, sql, not } from 'drizzle-orm'
 import { revalidateTag } from 'next/cache'
 import Pusher from 'pusher'
 
@@ -11,7 +11,7 @@ const pusher = new Pusher({
   appId: process.env.PUSHER_APP_ID!,
   key: process.env.NEXT_PUBLIC_PUSHER_APP_KEY!,
   secret: process.env.PUSHER_SECRET!,
-  cluster: process.env.PUSHER_CLUSTER!,
+  cluster: process.env.NEXT_PUBLIC_PUSHER_CLUSTER!,
   useTLS: true,
 })
 
@@ -35,7 +35,8 @@ export async function findOrJoinMatch(challengeId: number) {
     where: and(
       eq(challengeMatches.challengeId, challengeId),
       eq(challengeMatches.status, 'pending'),
-      isNull(challengeMatches.playerTwoId)
+      isNull(challengeMatches.playerTwoId),
+      not(eq(challengeMatches.playerOneId, userId))
     )
   })
 
