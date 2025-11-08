@@ -34,7 +34,7 @@ export default async function CompetePage({ params }: Props) {
   const langConfig = languageMap[challenge.question];
 
   if (!langConfig) {
-    return <div>Configuration error: Language "{challenge.question}" not mapped for competition.</div>
+    return <div>Configuration error: Language &quot;{challenge.question}&quot; not mapped for competition.</div>
   }
 
   const language = langConfig.monacoId;
