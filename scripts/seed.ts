@@ -412,19 +412,14 @@ const main = async () => {
         lessonId: 23,
         type: 'CODE',
         order: 1,
-<<<<<<< HEAD
         question: 'Python',
         problemDescription: 'Given an input string, write a Python function that returns the string reversed. For example, if the input is "hello", the output should be "olleh".',
-=======
-        question: 'Can an interface have constructors?',
->>>>>>> 5d3c6bc48e8e83c8fc2d63b8ed89013fe1a7fe42
       },
       {
         id: 18,
         lessonId: 24,
         type: 'CODE',
         order: 1,
-<<<<<<< HEAD
         question: 'C++ ',
         problemDescription: 'Given an input string, write a C++ function that returns the string reversed. For example, if the input is "hello", the output should be "olleh".', 
       },
@@ -444,11 +439,6 @@ const main = async () => {
         question: 'JavaScript',
         problemDescription: 'Given an input string, write a JavaScript function that returns the string reversed. For example, if the input is "hello", the output should be "olleh".'
       },
-=======
-        question: 'Reverse a string in Python.',
-        problemDescription: 'Given an input string, write a Python function that returns the string reversed. For example, if the input is "hello", the output should be "olleh".',
-      }
->>>>>>> 5d3c6bc48e8e83c8fc2d63b8ed89013fe1a7fe42
     ])
 
     await db.insert(schema.challengeOptions).values([
