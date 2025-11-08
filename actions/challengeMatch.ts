@@ -198,9 +198,9 @@ export async function submitP2PChallenge(matchId: number, code: string, language
         return { success: true, results: results };
 
     } else {
-        await pusher.trigger(`private-match-${matchId}-user-${userId}`, 'submission-failed', {
-            results: results
-        });
+        // await pusher.trigger(`private-match-${matchId}-user-${userId}`, 'submission-failed', {
+        //     results: results
+        // });
         const failedResult = results.find(r => r.status.id !== 3);
         const errorMessage = failedResult?.status?.description || 'Your solution failed one or more test cases.';
         return { error: errorMessage, results: results };

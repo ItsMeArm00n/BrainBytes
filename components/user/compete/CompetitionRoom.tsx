@@ -10,6 +10,7 @@ import { buttonVariants } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { useUser } from '@auth0/nextjs-auth0/client'
 import { useRouter } from 'next/navigation'
+import { CheckCircle, XCircle } from 'lucide-react'
 
 const FINDING_TOAST_ID = 'competition-finding'
 const WAITING_TOAST_ID = 'competition-waiting'
@@ -19,6 +20,15 @@ type Props = {
   challenge: ChallengeType
   language: string
   initialCode: string
+}
+
+type SubmissionResult = {
+  status: { id: number; description: string };
+  stdin: string;
+  expected_output: string;
+  stdout: string | null;
+  stderr: string | null;
+  compile_output: string | null;
 }
 
 export function CompetitionRoom({ challenge, language, initialCode }: Props) {
@@ -31,6 +41,8 @@ export function CompetitionRoom({ challenge, language, initialCode }: Props) {
   const [winnerId, setWinnerId] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [isSubmitting, startSubmission] = useTransition()
+  
+  const [submissionResults, setSubmissionResults] = useState<SubmissionResult[] | null>(null)
 
   const { user } = useUser()
   const userId = user?.sub
@@ -147,21 +159,32 @@ export function CompetitionRoom({ challenge, language, initialCode }: Props) {
 
   const handleSubmit = () => {
     if (!match) return;
+    
+    setSubmissionResults(null);
+    
     startSubmission(() => {
       toast.loading('Submitting and testing your solution...', { id: SUBMISSION_TOAST_ID });
       submitP2PChallenge(match.id, code, language)
         .then((res:any) => {
           toast.dismiss(SUBMISSION_TOAST_ID);
+          
+          if (res?.results) {
+            setSubmissionResults(res.results);
+          }
+          
           if (res?.error) {
             toast.error(res.error);
-          }
+          }   
         })
         .catch((err:any) => {
           toast.dismiss(SUBMISSION_TOAST_ID);
           toast.error(err?.message ?? 'Submission failed')
+          setSubmissionResults(null);
         });
     });
   }
+
+  const testCases = (challenge.testCases as Array<{input: string, output: string}>) || [];
 
   if (error) {
     return (
@@ -197,7 +220,7 @@ export function CompetitionRoom({ challenge, language, initialCode }: Props) {
      return (
       <div className="text-center p-10">
         <div className="text-4xl font-bold mb-4">
-          {winnerId === userId ? '🏆 You Won! 🏆' : '😔 You Lost 😔'}
+          {winnerId === userId ? '🎉 You Won! 🎉' : '😥 You Lost 😥'}
         </div>
         <p className="text-lg text-muted-foreground">
           {winnerId === userId 
@@ -217,11 +240,30 @@ export function CompetitionRoom({ challenge, language, initialCode }: Props) {
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-      <div className="bg-card border rounded-lg p-4">
-        <h2 className="text-xl font-semibold mb-2">Problem</h2>
-        <p className="text-muted-foreground whitespace-pre-wrap">
-          {challenge.problemDescription}
-        </p>
+      <div className="bg-card border rounded-lg p-4 space-y-4">
+        <div>
+          <h2 className="text-xl font-semibold mb-2">Problem</h2>
+          <p className="text-muted-foreground whitespace-pre-wrap">
+            {challenge.problemDescription}
+          </p>
+        </div>
+        
+        <div>
+          <h3 className="text-lg font-semibold mb-2">Examples</h3>
+          <div className="space-y-3">
+            {testCases.map((tc, index) => (
+              <div key={index} className="bg-muted/50 p-3 rounded-md">
+                <p className="font-mono text-sm">
+                  <strong>Input:</strong> {tc.input}
+                </p>
+                <p className="font-mono text-sm">
+                  <strong>Output:</strong> {tc.output}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+        
       </div>
 
       <div className="space-y-4">
@@ -252,6 +294,37 @@ export function CompetitionRoom({ challenge, language, initialCode }: Props) {
         >
           {isSubmitting ? 'Testing...' : 'Submit Solution'}
         </button>
+        
+        {submissionResults && (
+          <div className="bg-card border rounded-lg p-4 space-y-3">
+            <h3 className="text-lg font-semibold">Submission Results</h3>
+            {submissionResults.map((result, index) => {
+              const isPass = result.status.id === 3;
+              const statusColor = isPass ? 'text-green-500' : 'text-red-500';
+              const Icon = isPass ? CheckCircle : XCircle;
+
+              return (
+                <div key={index} className="bg-muted/50 p-3 rounded-md">
+                  <div className="flex items-center justify-between">
+                    <span className={cn("font-bold text-md", statusColor)}>
+                      <Icon className="inline-block mr-2 size-5" />
+                      Test Case {index + 1}: {result.status.description}
+                    </span>
+                  </div>
+                  <div className="mt-2 space-y-1 font-mono text-sm">
+                    <p><strong>Input:</strong> {result.stdin}</p>
+                    <p><strong>Expected:</strong> {result.expected_output}</p>
+                    <p>
+                      <strong>Your Output:</strong>{" "}
+                      {result.stdout ? result.stdout : (result.stderr || result.compile_output || "No output")}
+                    </p>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+        
       </div>
     </div>
   )
