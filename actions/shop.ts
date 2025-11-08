@@ -1,21 +1,21 @@
 'use server'
 
 import { auth } from '@clerk/nextjs/server'
-import { and, eq } from 'drizzle-orm'
+import { eq } from 'drizzle-orm'
 import { revalidatePath, revalidateTag } from 'next/cache'
 
 import { db } from '@/db/drizzle'
 import { userProgress } from '@/db/schema'
-import { SHOP_ITEMS } from '@/config/shop'
+import { SHOP_ITEMS, type ShopItem } from '@/config/shop'
 
-export async function purchaseHearts(itemId: number) {
+export async function purchaseWithCurrency(itemId: number) {
   const { userId } = await auth()
 
   if (!userId) {
     throw new Error('Unauthorized')
   }
 
-  const item = SHOP_ITEMS.find((i) => i.id === itemId)
+  const item = SHOP_ITEMS.find((i) => i.id === itemId) as ShopItem | undefined
 
   if (!item) {
     throw new Error('Item not found')
@@ -29,23 +29,27 @@ export async function purchaseHearts(itemId: number) {
     throw new Error('User progress not found')
   }
 
-  if (existingUserProgress.points < item.points) {
+  if (item.points > 0 && existingUserProgress.points < item.points) {
     throw new Error('Not enough points')
   }
 
-  if ('gemsRequired' in item && item.gemsRequired && existingUserProgress.gems < item.gemsRequired) {
+  if (item.gemsRequired && existingUserProgress.gems < item.gemsRequired) {
     throw new Error('Not enough gems')
   }
+
+  const newHearts = existingUserProgress.hearts + item.hearts
+  const rewardPoints = item.rewardPoints || 0
+  const newPoints = existingUserProgress.points - item.points + rewardPoints
+  const newGems = item.gemsRequired
+    ? existingUserProgress.gems - item.gemsRequired
+    : existingUserProgress.gems
 
   await db
     .update(userProgress)
     .set({
-      hearts: existingUserProgress.hearts + item.hearts,
-      points: existingUserProgress.points - item.points,
-      gems:
-        'gemsRequired' in item && item.gemsRequired
-          ? existingUserProgress.gems - item.gemsRequired
-          : existingUserProgress.gems,
+      hearts: newHearts,
+      points: newPoints,
+      gems: newGems,
     })
     .where(eq(userProgress.userId, userId))
 

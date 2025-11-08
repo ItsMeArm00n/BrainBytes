@@ -3,7 +3,7 @@
 import { useState, useTransition } from 'react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
-import { purchaseHearts } from '@/actions/shop'
+import { purchaseWithCurrency } from '@/actions/shop'
 import { verifyRedemption } from '@/actions/redeemVoucher'
 import type { ShopItem } from '@/config/shop'
 import { ethers } from 'ethers'
@@ -28,25 +28,28 @@ type ShopItemCardProps = {
 
 export function ShopItemCard({ item, hearts, points, gems, bytes }: ShopItemCardProps) {
   const [isPending, startTransition] = useTransition()
-  const [isLoading, setIsLoading] = useState(false)
+  const [isLoading, setIsLoading] = useState(false) 
 
   const hasEnoughPoints = item.points ? points >= item.points : true;
   const hasEnoughGems = 'gemsRequired' in item ? gems >= (item.gemsRequired || 0) : true;
   
   const isCryptoPurchase = !!item.byteCost && item.byteCost > 0;
   const isGemPurchase = 'gemsRequired' in item && item.gemsRequired && item.gemsRequired > 0;
+  const isPointPurchase = item.points > 0 && !isCryptoPurchase && !isGemPurchase;
 
   const hasEnoughBytes = item.byteCost ? Number(bytes) >= item.byteCost : true;
-  const canPurchase = ((isCryptoPurchase && hasEnoughBytes) || (isGemPurchase && hasEnoughGems)) && !isPending;
-  console.log("Item:",item);
-  console.log("Bytes:",Number(bytes));
-  console.log("Byte Balance:", hasEnoughBytes)
-
+  
+  const canPurchase = !isPending && (
+    (isCryptoPurchase && hasEnoughBytes) ||
+    (isGemPurchase && hasEnoughGems) ||
+    (isPointPurchase && hasEnoughPoints)
+  );
+  
   const handlePurchase = async () => {
-    if (isGemPurchase) {
+    if (isGemPurchase || isPointPurchase) {
       setIsLoading(true)
       startTransition(() => {
-        purchaseHearts(item.id)
+        purchaseWithCurrency(item.id)
           .then(() => {
             toast.success(`${item.title} purchased!`)
           })
@@ -58,13 +61,13 @@ export function ShopItemCard({ item, hearts, points, gems, bytes }: ShopItemCard
           })
       })
     }
-
-    if (isCryptoPurchase) {
+    else if (isCryptoPurchase) {
       if (!window.ethereum) {
         toast.error("Please install MetaMask or a compatible wallet.");
         return;
       }
       
+      setIsLoading(true);
       startTransition(async () => {
         try {
           const provider = new ethers.BrowserProvider(window.ethereum);
@@ -72,13 +75,12 @@ export function ShopItemCard({ item, hearts, points, gems, bytes }: ShopItemCard
           const contract = new ethers.Contract(BYTE_TOKEN_ADDRESS, byteTokenAbi, signer);
           
           const amount = ethers.parseUnits(item.byteCost!.toString(), B_DECIMALS);
-          console.log("Amount:",amount);
           toast.loading("Please approve the transaction in your wallet...");
+          
           const tx = await contract.transfer(SHOP_WALLET_ADDRESS, amount);
           
           toast.loading("Processing transaction...");
           await tx.wait(); 
-          console.log("TX:",tx);
 
           const result = await verifyRedemption(item.id, tx.hash);
 
@@ -90,6 +92,8 @@ export function ShopItemCard({ item, hearts, points, gems, bytes }: ShopItemCard
         } catch (err: any) {
           console.error(err);
           toast.error(err.reason || err.message || "Transaction failed");
+        } finally {
+          setIsLoading(false);
         }
       });
     }
@@ -105,12 +109,39 @@ export function ShopItemCard({ item, hearts, points, gems, bytes }: ShopItemCard
     costText = `${item.gemsRequired} 💎`;
     buttonText = `Purchase for ${costText}`;
     if (!hasEnoughGems) buttonText = "Not enough gems";
-  } else if (item.points > 0) {
+  } else if (isPointPurchase) {
      costText = `${item.points} Points`;
      buttonText = `Purchase for ${costText}`;
      if (!hasEnoughPoints) buttonText = "Not enough points";
   }
-  console.log("Button Text:",buttonText);
+
+  const renderCostDisplay = () => {
+    const costs = [];
+    if (item.points > 0) {
+      costs.push(
+        <span key="points" className={hasEnoughPoints ? 'text-primary' : 'text-destructive'}>
+          {item.points} Points
+        </span>
+      );
+    }
+    if ('gemsRequired' in item && item.gemsRequired && item.gemsRequired > 0) {
+      if (costs.length > 0) costs.push(<span key="gem-or" className="text-muted-foreground">or</span>);
+      costs.push(
+        <span key="gems" className={hasEnoughGems ? 'text-secondary' : 'text-destructive'}>
+          {item.gemsRequired} 💎
+        </span>
+      );
+    }
+    if (item.byteCost && item.byteCost > 0) {
+       if (costs.length > 0) costs.push(<span key="byte-or" className="text-muted-foreground">or</span>);
+       costs.push(
+         <span key="bytes" className={hasEnoughBytes ? 'text-yellow-500' : 'text-destructive'}>
+           {item.byteCost} BYTE
+         </span>
+       );
+    }
+    return costs;
+  }
 
   return (
     <div className="group relative overflow-hidden rounded-xl border-2 bg-card p-6 transition-all hover:border-primary/50 hover:shadow-lg">
@@ -126,31 +157,23 @@ export function ShopItemCard({ item, hearts, points, gems, bytes }: ShopItemCard
               +{item.hearts} ❤️
             </span>
           )}
-        </div>
-        <div className="flex items-center justify-center gap-2 text-sm">
-          <span className={hasEnoughPoints ? 'text-primary' : 'text-destructive'}>
-            {item.points} Points
-          </span>
-          {'gemsRequired' in item && item.gemsRequired && (
-            <>
-              <span className="text-muted-foreground">or</span>
-              <span className={hasEnoughGems ? 'text-secondary' : 'text-destructive'}>
-                {item.gemsRequired} 💎
-              </span>
-            </>
+          {'rewardPoints' in item && item.rewardPoints && item.rewardPoints > 0 && (
+             <span className="text-primary">
+              +{item.rewardPoints} XP
+            </span>
           )}
         </div>
-      </div>
-      <div className="text-center text-lg font-semibold text-primary">
-        {costText}
+        <div className="flex min-h-[20px] items-center justify-center gap-2 text-sm">
+          {renderCostDisplay()}
+        </div>
       </div>
       <Button
         onClick={handlePurchase}
-        disabled={!canPurchase}
+        disabled={!canPurchase || isLoading}
         className="mt-4 w-full"
         variant={canPurchase ? 'primary' : 'ghost'}
       >
-        {isLoading || isPending ? 'Purchasing...' : buttonText}
+        {isLoading || isPending ? 'Processing...' : buttonText}
       </Button>
     </div>
   )
@@ -165,7 +188,6 @@ type ShopGridProps = {
 }
 
 export function ShopGrid({ items, hearts, points, gems, bytes }: ShopGridProps) {
-  console.log("Item sent:",items);
   return (
     <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
       {items.map((item) => (

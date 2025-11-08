@@ -32,10 +32,11 @@ export const SHOP_ITEMS = [
     description: 'Get 100 bonus XP points',
     hearts: 0,
     points: 0,
+    rewardPoints: 100,
     byteCost: 0,
     icon: '⭐',
     gemsRequired: 10,
   },
 ] as const;
 
-export type ShopItem = (typeof SHOP_ITEMS)[number];
+export type ShopItem = (typeof SHOP_ITEMS)[number] & { rewardPoints?: number } & {gemsRequired?: number};
