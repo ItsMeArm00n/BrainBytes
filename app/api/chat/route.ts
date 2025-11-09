@@ -1,7 +1,7 @@
-// app/api/chat/route.ts
+import { GoogleGenAI } from "@google/genai";
+import { NextResponse } from "next/server";
 
-import { createGoogleGenerativeAI } from '@ai-sdk/google';
-import { streamText, convertToModelMessages } from 'ai';
+const ai = new GoogleGenAI({});
 
 export const maxDuration = 30;
 
@@ -25,26 +25,21 @@ Here is a summary of BrainBytes' features:
 Keep your answers concise and directly related to the user's questions about the BrainBytes platform.
 If you don't know the answer, say so. Do not make up features.
 Always be cheerful and encouraging!
+
+
+Here is the question below:\n
 `;
 
 export async function POST(req: Request) {
   const { messages } = await req.json();
+  console.log("Messages:",messages[0].parts[0].text);
 
-  const google = createGoogleGenerativeAI({
-    apiKey: process.env.GOOGLE_API_KEY,
+  const result = await ai.models.generateContent({
+    model: "gemini-2.5-flash",
+    contents: systemPrompt+messages[0].parts[0].text,
   });
-  console.log("System Prompt:",systemPrompt);
-  console.log("Messages:",convertToModelMessages(messages));
-  console.log("Messages:",convertToModelMessages(messages)[0].content);
-  const result = await streamText({
-    // FIX: Use 'gemini-pro' which is compatible with the v1beta API.
-    // The 'gemini-1.5-flash-latest' model isn't found on that endpoint.
-    // Also, remove the 'models/' prefix; the SDK handles that.
-    model: google('gemini-2.5-pro'),
-    system: systemPrompt,
-    messages: convertToModelMessages(messages), 
-  });
-  console.log("result:",result.toTextStreamResponse())
 
-  return result.toTextStreamResponse();
+  console.log("Result:",result.candidates![0].content?.parts![0].text);    
+
+  return result.candidates![0].content?.parts![0].text;
 }
