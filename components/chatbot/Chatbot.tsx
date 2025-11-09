@@ -82,7 +82,7 @@ export function Chatbot() {
                   <Bot className="size-5" />
                 </span>
                 <div className="max-w-xs rounded-2xl rounded-bl-none bg-surface-variant px-4 py-3 text-sm leading-relaxed text-foreground">
-                  Hi there! I'm ByteBot. Ask me anything about the BrainBytes
+                  Hi there! I&apos;m ByteBot. Ask me anything about the BrainBytes
                   platform.
                 </div>
               </div>
