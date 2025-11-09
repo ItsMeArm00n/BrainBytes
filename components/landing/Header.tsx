@@ -11,7 +11,6 @@ import GithubSVG from '@/public/img/github.svg'
 
 export function Header() {
   const { authUser, isAuthLoading, profile, isProfileLoading } = useUserProfile()
-  console.log("Logo:",LogoSVG)
   const isLoading = isAuthLoading || (authUser && isProfileLoading)
   const isAuthenticated = !!authUser
 
@@ -39,10 +38,10 @@ export function Header() {
           className="focus-visible group flex h-16 w-14 flex-col items-center gap-1 rounded-b-3xl bg-secondary/30 px-[6px] pt-2 text-2xl transition-colors hover:bg-primary/25 dark:bg-card dark:hover:bg-border/70 sm:size-32 sm:rounded-b-4xl sm:pt-4 sm:text-3xl lg:w-36 lg:text-4xl"
           title="BrainBytes app"
         >
-          <div className="group-hover:animate-bounce">
-            <LogoSVG />
-          </div>
-          <span className="font-display -tracking-widest max-sm:sr-only">BrainBytes</span>
+          <span className="flex flex-1 w-full items-center justify-center">
+            <LogoSVG className="h-10 w-auto max-sm:h-8 sm:h-16" aria-hidden="true" />
+          </span>
+          <span className="font-display -tracking-widest">BrainBytes</span>
         </NextLink>
         <div className="flex flex-1 items-center justify-end">
           {isLoading ? (

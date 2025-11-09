@@ -2,46 +2,46 @@ export const courses = [
   {
     title: 'Python',
     icon: 'py',
-    topic: 'Arrays',
+    topic: 'Automation & APIs',
   },
   {
     title: 'JavaScript',
     icon: 'js',
-    topic: 'Linked Lists',
+    topic: 'Interactive Web Apps',
   },
   {
     title: 'C++',
     icon: 'cpp',
-    topic: 'Trees',
+    topic: 'Modern Systems Design',
   },
   {
     title: 'Java',
     icon: 'java',
-    topic: 'Graphs',
+    topic: 'Enterprise Services',
   },
   {
     title: 'TypeScript',
     icon: 'ts',
-    topic: 'Sorting',
+    topic: 'Typed Frontends',
   },
   {
     title: 'Go',
     icon: 'go',
-    topic: 'Searching',
+    topic: 'Concurrent APIs',
   },
   {
     title: 'Rust',
     icon: 'rust',
-    topic: 'Dynamic Programming',
+    topic: 'Memory-Safe Performance',
   },
   {
     title: 'Swift',
     icon: 'swift',
-    topic: 'Stacks & Queues',
+    topic: 'iOS Experiences',
   },
   {
     title: 'Kotlin',
     icon: 'kotlin',
-    topic: 'Hash Tables',
+    topic: 'Android Experiences',
   },
 ]

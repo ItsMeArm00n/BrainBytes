@@ -34,8 +34,8 @@ export function Metrics({ children }: PropsWithChildren) {
         <li className="sticky top-[20%] col-start-2 col-end-12 pb-8 sm:col-start-3 sm:col-end-8 sm:pb-16 lg:top-[5%] lg:pb-40">
           <MetricsItem
             className="bg-primary-light"
-            number={2000}
-            description="DSA problems to solve"
+            number={120}
+            description="guided projects per language"
             offset={20}
             progress={scrollYProgress}
           >
@@ -45,8 +45,8 @@ export function Metrics({ children }: PropsWithChildren) {
         <li className="sticky top-[22.5%] col-start-2 col-end-12 pb-8 sm:col-start-1 sm:col-end-5 sm:pb-16 lg:pb-40">
           <MetricsItem
             className="bg-secondary"
-            number={9}
-            description="programming languages"
+            number={12}
+            description="languages to dive deep into"
             offset={22.5}
             progress={scrollYProgress}
           >
@@ -56,10 +56,10 @@ export function Metrics({ children }: PropsWithChildren) {
         <li className="sticky top-[25%] col-start-2 col-end-12 pb-8 sm:col-start-6 sm:col-end-10 sm:pb-16 lg:pb-40">
           <MetricsItem
             className="bg-highlight"
-            number={6}
+            number={3}
             prefix="~"
             suffix="M"
-            description="users globally"
+            description="lines of annotated sample code"
             offset={25}
             progress={scrollYProgress}
           >
@@ -69,9 +69,9 @@ export function Metrics({ children }: PropsWithChildren) {
         <li className="sticky top-[20%] col-start-1 col-end-13 pb-8 sm:col-start-2 sm:col-end-9 sm:pb-16 lg:top-[5%] lg:pb-40">
           <MetricsItem
             className="bg-gradient-to-b from-primary to-primary-depth to-80%"
-            number={95}
+            number={94}
             suffix="%"
-            description="interview success rate"
+            description="learners shipping apps in a new language"
             offset={20}
             progress={scrollYProgress}
             last

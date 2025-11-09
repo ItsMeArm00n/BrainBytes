@@ -17,7 +17,7 @@ export function Reasons() {
         <li>
           <ReasonsItem
             className="text-primary-dark bg-primary/80 hover:bg-primary/65 dark:hover:bg-primary"
-            reason="Master algorithms 5x faster"
+            reason="Master new language features with real projects"
           >
             <Zap />
           </ReasonsItem>
@@ -25,7 +25,7 @@ export function Reasons() {
         <li>
           <ReasonsItem
             className="bg-secondary/60 text-secondary-depth hover:bg-secondary/40 dark:bg-secondary/85 dark:hover:bg-secondary"
-            reason="Ace coding interviews with confidence"
+            reason="Stay current with language releases and tooling"
             delay={0.2}
           >
             <Atom />
@@ -33,7 +33,7 @@ export function Reasons() {
         </li>
         <li>
           <ReasonsItem
-            reason="Track progress and earn achievements"
+            reason="Earn skill badges for every language milestone"
             className="bg-highlight/60 text-highlight-depth hover:bg-highlight/40 dark:bg-highlight/85 dark:hover:bg-highlight"
             delay={0.3}
           >
@@ -42,7 +42,7 @@ export function Reasons() {
         </li>
         <li>
           <ReasonsItem
-            reason="Learn DSA in any programming language"
+            reason="Collaborate with learners across every stack"
             className="bg-primary-light/60 text-primary-depth hover:bg-primary-light/40 dark:hover:bg-primary-light"
             delay={0.4}
           >
