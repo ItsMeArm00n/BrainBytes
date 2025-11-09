@@ -40,7 +40,7 @@ export async function POST(req: Request) {
     // FIX: Use 'gemini-pro' which is compatible with the v1beta API.
     // The 'gemini-1.5-flash-latest' model isn't found on that endpoint.
     // Also, remove the 'models/' prefix; the SDK handles that.
-    model: google('gemini-2.5-flash'),
+    model: google('gemini-2.5-pro'),
     system: systemPrompt,
     messages: convertToModelMessages(messages), 
   });
