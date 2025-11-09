@@ -5,13 +5,19 @@ import {
   quests,
   userQuestProgress,
   questTypeEnum,
+  type Quest,
+  type UserQuestProgress,
 } from '@/db/schema/quests'
 import { userProgress } from '@/db/schema/userProgress'
-import { eq, and, sql, inArray } from 'drizzle-orm'
+import { eq, and, inArray } from 'drizzle-orm'
 import { revalidateTag } from 'next/cache'
 import { getOptionalUser } from '@/lib/auth0'
 
-export const getQuests = async (userId?: string | null) => {
+type QuestWithProgress = Quest & {
+  userQuestProgress: UserQuestProgress[]
+}
+
+export const getQuests = async (userId?: string | null): Promise<QuestWithProgress[]> => {
   if (userId === null) return []
 
   let finalUserId: string
@@ -32,7 +38,7 @@ export const getQuests = async (userId?: string | null) => {
     },
   })
 
-  return data
+  return data as QuestWithProgress[]
 }
 
 export const updateQuestProgress = async (

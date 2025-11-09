@@ -24,14 +24,14 @@ export function Unit({
     <section className="space-y-10 pb-16">
       <UnitBanner title={title} description={description} color={variant} />
       <ul className="flex flex-col items-center space-y-5">
-        {lessons.map(({ id, completed }, idx, _lessons) => {
+        {lessons.map(({ id, completed, title: lessonTitle }, idx, _lessons) => {
           return (
             <li key={id}>
               <LearnButton
                 id={id}
                 index={idx}
                 totalCount={_lessons.length}
-                title={title}
+                title={lessonTitle}
                 current={id === activeLessonId}
                 completed={completed}
                 percentage={activeLessonPercentage}

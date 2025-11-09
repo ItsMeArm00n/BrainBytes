@@ -15,7 +15,7 @@ export const forumThreads = pgTable('forum_threads', {
   lastActivityAt: timestamp('last_activity_at', { withTimezone: true }).notNull().defaultNow(),
 })
 
-export const forumPosts = pgTable('forum_posts', {
+export const forumPosts: any = pgTable('forum_posts', {
   id: serial('id').primaryKey(),
   threadId: integer('thread_id').notNull().references(() => forumThreads.id, { onDelete: 'cascade' }),
   parentPostId: integer('parent_post_id').references(() => forumPosts.id, { onDelete: 'cascade' }),

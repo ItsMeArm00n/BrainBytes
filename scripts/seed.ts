@@ -293,6 +293,79 @@ const main = async () => {
       { input: '', output: '' },
     ]
 
+    const pythonStub = `def reverse_string(s):
+  # Your code here
+  return ""
+
+# Read input from stdin
+try:
+  s_input = input()
+  # Call the function and print the result
+  print(reverse_string(s_input))
+except EOFError:
+  pass
+`
+
+    const jsStub = `function reverseString(s) {
+  // Your code here
+  return "";
+}
+
+// Read input from stdin
+const readline = require('readline');
+const rl = readline.createInterface({
+  input: process.stdin,
+  output: process.stdout,
+  terminal: false
+});
+
+let inputData = '';
+rl.on('line', function(line){
+  inputData += line;
+});
+
+rl.on('close', function() {
+  // Call the function and print the result
+  console.log(reverseString(inputData));
+});
+`
+
+    const javaStub = `import java.util.Scanner;
+
+class Solution {
+    public String reverseString(String s) {
+        // Your code here
+        return "";
+    }
+
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        String s = "";
+        if (sc.hasNextLine()) {
+            s = sc.nextLine();
+        }
+        Solution sol = new Solution();
+        System.out.println(sol.reverseString(s));
+        sc.close();
+    }
+}`
+
+    const cppStub = `#include <iostream>
+#include <string>
+#include <algorithm>
+
+std::string reverseString(std::string s) {
+  // Your code here
+  return "";
+}
+
+int main() {
+    std::string s;
+    std::getline(std::cin, s);
+    std::cout << reverseString(s) << std::endl;
+    return 0;
+}`
+
     await db.insert(schema.challenges).values([
       // Python - Lesson 1: Array Basics
       {
@@ -422,10 +495,10 @@ const main = async () => {
         order: 1,
         question: 'Python Reverse String',
         problemDescription: 'Given an input string, write a Python function that returns the string reversed. For example, if the input is "hello", the output should be "olleh".',
-        stubCodePy: 'def reverse_string(s):\n  # Your code here\n  return ""',
-        stubCodeJs: 'function reverseString(s) {\n  // Your code here\n  return "";\n}',
-        stubCodeJava: 'class Solution {\n    public String reverseString(String s) {\n        // Your code here\n        return "";\n    }\n}',
-        stubCodeCpp: '#include <string>\n#include <algorithm>\n\nstd::string reverseString(std::string s) {\n  // Your code here\n  return "";\n}',
+        stubCodePy: pythonStub,
+        stubCodeJs: jsStub,
+        stubCodeJava: javaStub,
+        stubCodeCpp: cppStub,
         testCases: reverseStringTestCases,
       },
       {
@@ -435,10 +508,10 @@ const main = async () => {
         order: 1,
         question: 'C++ Reverse String',
         problemDescription: 'Given an input string, write a C++ function that returns the string reversed. For example, if the input is "hello", the output should be "olleh".', 
-        stubCodePy: 'def reverse_string(s):\n  # Your code here\n  return ""',
-        stubCodeJs: 'function reverseString(s) {\n  // Your code here\n  return "";\n}',
-        stubCodeJava: 'class Solution {\n    public String reverseString(String s) {\n        // Your code here\n        return "";\n    }\n}',
-        stubCodeCpp: '#include <string>\n#include <algorithm>\n\nstd::string reverseString(std::string s) {\n  // Your code here\n  return "";\n}',
+        stubCodePy: pythonStub,
+        stubCodeJs: jsStub,
+        stubCodeJava: javaStub,
+        stubCodeCpp: cppStub,
         testCases: reverseStringTestCases,
       },
         {
@@ -448,10 +521,10 @@ const main = async () => {
         order: 1,
         question: 'Java Reverse String',
         problemDescription: 'Given an input string, write a Java function that returns the string reversed. For example, if the input is "hello", the output should be "olleh".',
-        stubCodePy: 'def reverse_string(s):\n  # Your code here\n  return ""',
-        stubCodeJs: 'function reverseString(s) {\n  // Your code here\n  return "";\n}',
-        stubCodeJava: 'class Solution {\n    public String reverseString(String s) {\n        // Your code here\n        return "";\n    }\n}',
-        stubCodeCpp: '#include <string>\n#include <algorithm>\n\nstd::string reverseString(std::string s) {\n  // Your code here\n  return "";\n}',
+        stubCodePy: pythonStub,
+        stubCodeJs: jsStub,
+        stubCodeJava: javaStub,
+        stubCodeCpp: cppStub,
         testCases: reverseStringTestCases,
       },
       {
@@ -461,10 +534,10 @@ const main = async () => {
         order: 1,
         question: 'JavaScript Reverse String',
         problemDescription: 'Given an input string, write a JavaScript function that returns the string reversed. For example, if the input is "hello", the output should be "olleh".',
-        stubCodePy: 'def reverse_string(s):\n  # Your code here\n  return ""',
-        stubCodeJs: 'function reverseString(s) {\n  // Your code here\n  return "";\n}',
-        stubCodeJava: 'class Solution {\n    public String reverseString(String s) {\n        // Your code here\n        return "";\n    }\n}',
-        stubCodeCpp: '#include <string>\n#include <algorithm>\n\nstd::string reverseString(std::string s) {\n  // Your code here\n  return "";\n}',
+        stubCodePy: pythonStub,
+        stubCodeJs: jsStub,
+        stubCodeJava: javaStub,
+        stubCodeCpp: cppStub,
         testCases: reverseStringTestCases,
       },
     ])

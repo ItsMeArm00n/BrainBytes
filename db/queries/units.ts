@@ -17,25 +17,32 @@ export const getUnits = cache(async (userId: string | null) => {
         with: {
           challenges: {
             with: {
-              challengeProgress: { where: ({ userId: _userId }, { eq }) => eq(_userId, userId) },
+              challengeProgress: { where: ({ userId: _userId }:any, { eq }:any) => eq(_userId, userId) },
             },
           },
         },
       },
     },
   })
+  
   const normalizedData = data.map((unit) => ({
     ...unit,
-    lessons: unit.lessons.map(({ challenges, ...lesson }) => ({
-      ...lesson,
-      challenges,
-      completed:
-        !!challenges.length &&
-        challenges.every(
-          ({ challengeProgress }) =>
-            !!challengeProgress.length && challengeProgress.every(({ completed }) => completed)
-        ),
-    })),
+    lessons: unit.lessons.map((lesson) => {
+      const completed =
+        !!lesson.challenges.length &&
+        lesson.challenges.every(
+          ({ challengeProgress }:any) =>
+            !!challengeProgress.length && challengeProgress.every(({ completed }:any) => completed)
+        )
+      
+      return {
+        id: lesson.id,
+        title: lesson.title,
+        unitId: lesson.unitId,
+        order: lesson.order,
+        completed: completed,
+      }
+    }),
   }))
 
   return normalizedData
@@ -57,7 +64,7 @@ export const getCourseProgress = cache(async (userId: string | null) => {
           challenges: {
             with: {
               challengeProgress: {
-                where: ({ userId: _userId }, { eq }) => eq(_userId, userId),
+                where: ({ userId: _userId }:any, { eq }:any) => eq(_userId, userId),
               },
             },
           },
@@ -70,10 +77,10 @@ export const getCourseProgress = cache(async (userId: string | null) => {
     .flatMap((unit) => unit.lessons)
     .find((lesson) =>
       lesson.challenges.some(
-        ({ challengeProgress }) =>
+        ({ challengeProgress }:any) =>
           !challengeProgress ||
           challengeProgress.length === 0 ||
-          challengeProgress.some(({ completed }) => !completed)
+          challengeProgress.some(({ completed }:any) => !completed)
       )
     )
 

@@ -21,30 +21,12 @@ import { Separator } from '@/components/ui/separator'
 import { PostComposer } from './PostComposer'
 import { ensureDate, formatRelativeTime, type ForumViewer } from './utils'
 
-type ForumPost = {
-  id: number
-  threadId: number
-  parentPostId: number | null
-  authorId: string
-  authorName: string
-  authorAvatar: string
-  body: string
-  isDeleted: boolean
-  createdAt: string | Date
-  updatedAt: string | Date
-}
+import type { InferSelectModel } from 'drizzle-orm'
+import type { forumPosts, forumThreads } from '@/db/schema'
 
-type ForumThreadDetail = {
-  id: number
-  title: string
-  body: string
-  authorId: string
-  authorName: string
-  authorAvatar: string
-  createdAt: string | Date
-  updatedAt: string | Date
-  isPinned: boolean
-  isLocked: boolean
+type ForumPost = InferSelectModel<typeof forumPosts>
+
+type ForumThreadDetail = InferSelectModel<typeof forumThreads> & {
   posts: ForumPost[]
 }
 
