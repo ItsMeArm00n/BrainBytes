@@ -8,12 +8,12 @@ type DashboardLayoutProps = {
 export default function DashboardLayout({ main, userProgress }: DashboardLayoutProps) {
   return (
     <>
-      <div className="flex-grow-[2] basis-[330px]">{main}</div>
-      <div className="sticky bottom-6 flex-grow basis-[280px] self-end max-md:hidden">
-        <div className="sticky top-6 flex min-h-[calc(100vh-3rem)] flex-col justify-between gap-y-4">
+      <div className="flex-1 basis-[330px] min-w-0">{main}</div>
+      <aside className="relative flex-none max-md:hidden">
+        <div className="pointer-events-auto sticky top-6 z-30 flex h-[calc(100vh-3rem)] w-fit min-w-[180px] flex-col items-stretch justify-center">
           {userProgress}
         </div>
-      </div>
+      </aside>
     </>
   )
 }

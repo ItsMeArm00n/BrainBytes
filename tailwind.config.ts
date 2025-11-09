@@ -25,10 +25,21 @@ const config = {
       },
       colors: {
         border: 'hsl(var(--border))',
+        outline: {
+          DEFAULT: 'hsl(var(--outline))',
+          variant: 'hsl(var(--outline-variant))',
+        },
         input: 'hsl(var(--input))',
         ring: 'hsl(var(--ring))',
         background: 'hsl(var(--background))',
         foreground: 'hsl(var(--foreground))',
+        surface: {
+          DEFAULT: 'hsl(var(--surface))',
+          variant: 'hsl(var(--surface-variant))',
+          muted: 'hsl(var(--surface-muted))',
+          emphasis: 'hsl(var(--surface-emphasis))',
+          dim: 'hsl(var(--surface-dim))',
+        },
         primary: {
           DEFAULT: 'hsl(var(--primary))',
           foreground: 'hsl(var(--primary-foreground))',
@@ -61,6 +72,7 @@ const config = {
         },
         highlight: {
           DEFAULT: 'hsl(var(--highlight))',
+          foreground: 'hsl(var(--highlight-foreground))',
           depth: 'hsl(var(--highlight-depth))',
         },
         disabled: {

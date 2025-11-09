@@ -11,7 +11,7 @@ import GithubSVG from '@/public/img/github.svg'
 
 export function Header() {
   const { authUser, isAuthLoading, profile, isProfileLoading } = useUserProfile()
-
+  console.log("Logo:",LogoSVG)
   const isLoading = isAuthLoading || (authUser && isProfileLoading)
   const isAuthenticated = !!authUser
 
