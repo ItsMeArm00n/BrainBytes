@@ -290,7 +290,6 @@ const main = async () => {
       { input: 'world', output: 'dlrow' },
       { input: 'BrainBytes', output: 'setyBniarB' },
       { input: 'a', output: 'a' },
-      { input: '', output: '' },
     ]
 
     const pythonStub = `def reverse_string(s):
