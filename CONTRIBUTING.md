@@ -37,7 +37,7 @@ The following is a set of guidelines for contributing to BrainBytes. These are m
     ```
 * **Database Changes**: If you modify the schema in `db/schema/`, generate a migration:
     ```bash
-    pnpm db:generate
+    pnpm db:gen
     ```
 * **Linting**: Ensure your code follows the project's style:
     ```bash

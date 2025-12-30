@@ -2,7 +2,7 @@
   <div align="left">
 
 <div style="margin: 15px 0;" align="center">
-    <img src="https://readme-typing-svg.herokuapp.com?font=Fira+Code&pause=1000&color=FF0000&width=435&lines=Welcome+to+BrainBytes"/></a>" 
+    <img src="https://readme-typing-svg.herokuapp.com?font=Fira+Code&pause=1000&color=FF0000&width=435&lines=Welcome+to+BrainBytes"/></a>
   </div>
   
  <img src="https://user-images.githubusercontent.com/74038190/212284100-561aa473-3905-4a80-b561-0d28506553ee.gif" width="100%">
@@ -72,7 +72,7 @@ To create an engaging, modern, and comprehensive platform for learning programmi
 ## 🛠️ Tech Stack
 - **Frontend**: [Next.js (App Router)](https://nextjs.org/), [React](https://react.dev/), [TypeScript](https://www.typescriptlang.org/), [Tailwind CSS](https://tailwindcss.com/)
 
-- **UI Components**: [shadcn/ui](https://ui.shadcn.com/), [Vaul](https://www.google.com/search?q=https://vaul.emilbaehr.com/) (drawers)
+- **UI Components**: [shadcn/ui](https://ui.shadcn.com/), [Vaul](https://vaul.emilbaehr.com/) (drawers)
 
 - **Animation**: [Framer Motion](https://www.framer.com/motion/)
 
@@ -108,7 +108,7 @@ Follow these instructions to get a copy of the project up and running on your lo
 
 - [Pusher](https://pusher.com/) account
 
-- [Judge0](https://www.google.com/search?q=https://rapidapi.com/judge0-com/api/judge0-ce) API Key (optional, for PvP)
+- [Judge0](https://judge0.com/) API Key (optional, for PvP)
 
 **Installation**
 1. Clone the repository:
@@ -152,12 +152,6 @@ pnpm db:push
 pnpm db:seed
 ```
 6.Deploy Smart Contract (Optional, for Blockchain features): If you want to test the blockchain features, you need to deploy the ByteToken contract to a testnet (like Sepolia).
-
-```Bash
-# This script deploys the contract and prints the address
-npx hardhat ignition deploy ./ignition/modules/Lock.ts --network sepolia
-```
-*Note: The `Lock.ts` ignition module seems to be for a `Lock` contract, not `ByteToken`. You may need to create a new deployment script for ByteToken.sol or use the `scripts/deploy.ts` file.*
 
 ```Bash
 # This looks like the correct script to deploy the ByteToken
