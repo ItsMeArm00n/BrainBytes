@@ -1,0 +1,83 @@
+name: Database Schema Verification
+
+on:
+  pull_request:
+    branches:
+      - main
+      - develop
+    paths:
+      - 'db/schema/**'
+      - 'drizzle.config.ts'
+      - 'drizzle/**'
+      - '.github/workflows/database-schema-ci.yml'
+  push:
+    branches:
+      - main
+      - develop
+    paths:
+      - 'db/schema/**'
+      - 'drizzle.config.ts'
+      - 'drizzle/**'
+      - '.github/workflows/database-schema-ci.yml'
+
+jobs:
+  schema-verification:
+    runs-on: ubuntu-latest
+    
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: test_user
+          POSTGRES_PASSWORD: test_password
+          POSTGRES_DB: test_db
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+          
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 9
+          
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+        
+      - name: Set environment variables
+        run: |
+          echo "DATABASE_URL=postgresql://test_user:test_password@localhost:5432/test_db" >> $GITHUB_ENV
+        
+      - name: Wait for PostgreSQL to be ready
+        run: |
+          until pg_isready -h localhost -p 5432 -U test_user; do
+            echo "Waiting for PostgreSQL..."
+            sleep 1
+          done
+        env:
+          PGPASSWORD: test_password
+          
+      - name: Validate Drizzle schema
+        run: pnpm drizzle-kit check
+        
+      - name: Generate migrations
+        run: pnpm drizzle-kit generate
+        
+      - name: Verify migrations can be applied
+        run: pnpm drizzle-kit migrate
+        
+      - name: Verify schema consistency
+        run: pnpm drizzle-kit push --skip-validations
