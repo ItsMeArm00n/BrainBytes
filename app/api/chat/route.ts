@@ -162,9 +162,32 @@ export async function POST(req: Request) {
       model: 'gemini-2.5-flash',
       contents: systemPrompt + userText,
     })
-  } catch (err) {
+  } catch (err: unknown) {
     console.error('[chat] AI generation failed:', err)
-    return new NextResponse('AI generation failed', { status: 500 })
+
+    let userMessage = 'AI generation failed due to an internal error. Please try again.'
+
+    if (err && typeof err === 'object') {
+      const anyErr = err as any
+      const statusCode = anyErr.status ?? anyErr.statusCode
+      const errorMessage = typeof anyErr.message === 'string' ? anyErr.message : ''
+
+      if (statusCode === 429) {
+        userMessage =
+          'AI generation failed because the rate limit was exceeded. Please wait a moment and try again.'
+      } else if (typeof statusCode === 'number' && statusCode >= 500) {
+        userMessage =
+          'AI generation failed because the AI service is temporarily unavailable. Please try again later.'
+      } else if (typeof statusCode === 'number' && statusCode >= 400) {
+        userMessage =
+          'AI generation failed due to invalid input to the AI service. Please check your request and try again.'
+      } else if (errorMessage.toLowerCase().includes('timeout')) {
+        userMessage =
+          'AI generation failed because the request to the AI service timed out. Please try again.'
+      }
+    }
+
+    return new NextResponse(userMessage, { status: 500 })
   }
 
   // Safely extract the text from the response
