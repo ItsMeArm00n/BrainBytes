@@ -2,6 +2,9 @@ name: Web Application CI
 
 on:
   pull_request:
+    branches:
+      - main
+      - develop
     paths:
       - 'app/**'
       - 'components/**'

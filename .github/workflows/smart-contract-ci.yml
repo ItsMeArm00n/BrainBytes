@@ -2,9 +2,13 @@ name: Smart Contract CI
 
 on:
   pull_request:
+    branches:
+      - main
+      - develop
     paths:
       - 'contracts/**'
       - 'hardhat.config.ts'
+      - 'test/**'
       - 'scripts/deploy.ts'
       - 'package.json'
       - 'pnpm-lock.yaml'
