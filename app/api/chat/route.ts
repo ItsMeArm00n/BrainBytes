@@ -77,8 +77,11 @@ function isValidMessage(first: any): boolean {
 
   if (
     Array.isArray(first.content) &&
-    first.content.some((c: any) =>
-      typeof c === 'string' || typeof c?.text === 'string' || (Array.isArray(c?.parts) && c.parts.some((pp: any) => typeof pp?.text === 'string'))
+    first.content.some(
+      (c: any) =>
+        (typeof c === 'string' && c.trim()) ||
+        (typeof c?.text === 'string' && c.text.trim()) ||
+        (Array.isArray(c?.parts) && c.parts.some((pp: any) => typeof pp?.text === 'string' && pp.text.trim()))
     )
   )
     return true
