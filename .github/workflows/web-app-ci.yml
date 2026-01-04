@@ -105,7 +105,6 @@ jobs:
       
       - name: Run npm audit (stricter)
         run: npm audit --audit-level=low
-        continue-on-error: true
   
   code-quality:
     runs-on: ubuntu-latest
