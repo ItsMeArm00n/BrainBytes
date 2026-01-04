@@ -12,14 +12,11 @@ const main = async () => {
   try {
     console.log('🚧 [DB]: Seeding database...')
 
-    await db.delete(schema.challengeProgress)
     await db.delete(schema.challengeOptions)
     await db.delete(schema.challenges)
     await db.delete(schema.lessons)
     await db.delete(schema.units)
-    await db.delete(schema.userQuestProgress)
     await db.delete(schema.quests)
-    await db.delete(schema.userProgress)
     await db.delete(schema.courses)
 
     await db.insert(schema.courses).values([
