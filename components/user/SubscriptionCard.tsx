@@ -82,6 +82,7 @@ export function SubscriptionCard({ isActive, isCryptoSubscription, subscriptionT
         console.error(err)
         toast.error(err.reason || err.message || "Transaction failed")
       } finally {
+        toast.dismiss()
         setIsLoading(false)
       }
     })
