@@ -27,17 +27,58 @@ export const createCryptoSubscription = async (txHash: string) => {
       throw new Error("Transaction not found on blockchain");
     }
 
-    // Verify the transaction was sent to the shop wallet
-    if (tx.to?.toLowerCase() !== SHOP_WALLET_ADDRESS.toLowerCase()) {
-      throw new Error("Transaction was not sent to the correct address");
+    // Fetch the transaction receipt to inspect ERC20 Transfer events
+    const receipt = await provider.getTransactionReceipt(txHash);
+    if (!receipt) {
+      throw new Error("Transaction receipt not found on blockchain");
+    }
+    if (receipt.status !== 1) {
+      throw new Error("Transaction did not succeed");
     }
 
-    // Verify the amount (20000 BYTE tokens)
+    // Determine the BYTE token contract address from the imported contract
+    const tokenContractAddressRaw =
+      (byteTokenContract as any).target ?? (byteTokenContract as any).address;
+    if (!tokenContractAddressRaw) {
+      throw new Error("BYTE token contract address is not configured");
+    }
+    const tokenContractAddress = tokenContractAddressRaw.toLowerCase();
+
+    // Optionally ensure the transaction interacted with the BYTE token contract
+    if (tx.to?.toLowerCase() !== tokenContractAddress) {
+      throw new Error("Transaction was not sent to the BYTE token contract");
+    }
+
+    // Verify there is a Transfer event to the shop wallet for the expected amount
     const expectedAmount = ethers.parseUnits(SUBSCRIPTION_COST_BYTE.toString(), 18);
-    if (tx.value !== expectedAmount) {
-      throw new Error("Transaction amount is incorrect");
+    const transferEvent = byteTokenContract.interface.getEvent("Transfer");
+    const transferTopic = byteTokenContract.interface.getEventTopic(transferEvent);
+
+    let validPaymentFound = false;
+    for (const log of receipt.logs) {
+      if (log.address.toLowerCase() !== tokenContractAddress) {
+        continue;
+      }
+      if (!log.topics || log.topics.length === 0 || log.topics[0] !== transferTopic) {
+        continue;
+      }
+
+      const parsedLog = byteTokenContract.interface.parseLog(log);
+      const toAddress = (parsedLog.args.to as string).toLowerCase();
+      const amount = parsedLog.args.value as bigint;
+
+      if (
+        toAddress === SHOP_WALLET_ADDRESS.toLowerCase() &&
+        amount === expectedAmount
+      ) {
+        validPaymentFound = true;
+        break;
+      }
     }
 
+    if (!validPaymentFound) {
+      throw new Error("Valid BYTE token payment to the shop wallet was not found in transaction logs");
+    }
     // Check if user already has an active subscription
     const existingSubscription = await db.query.userSubscription.findFirst({
       where: eq(userSubscription.userId, userId),
