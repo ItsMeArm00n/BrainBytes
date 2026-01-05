@@ -5,7 +5,6 @@ import { db } from '@/db/drizzle';
 import { userSubscription } from '@/db/schema';
 import { eq } from 'drizzle-orm';
 import { requireUser } from '@/lib/auth0';
-import { byteTokenContract } from '@/lib/ethers';
 
 const SHOP_WALLET_ADDRESS = process.env.NEXT_PUBLIC_SHOP_WALLET_ADDRESS!;
 const SUBSCRIPTION_COST_BYTE = 20000; // 20000 BYTE tokens for subscription (equivalent to $20)
