@@ -5,6 +5,7 @@ import { db } from '@/db/drizzle';
 import { userSubscription } from '@/db/schema';
 import { eq } from 'drizzle-orm';
 import { requireUser } from '@/lib/auth0';
+import { byteTokenContract } from '@/lib/ethers';
 
 const SHOP_WALLET_ADDRESS = process.env.NEXT_PUBLIC_SHOP_WALLET_ADDRESS!;
 const SUBSCRIPTION_COST_BYTE = 20000; // 20000 BYTE tokens for subscription (equivalent to $20)
@@ -50,8 +51,7 @@ export const createCryptoSubscription = async (txHash: string) => {
 
     // Verify there is a Transfer event to the shop wallet for the expected amount
     const expectedAmount = ethers.parseUnits(SUBSCRIPTION_COST_BYTE.toString(), 18);
-    const transferEvent = byteTokenContract.interface.getEvent("Transfer");
-    const transferTopic = byteTokenContract.interface.getEventTopic(transferEvent);
+    const transferTopic = ethers.keccak256(ethers.toUtf8Bytes("Transfer(address,address,uint256)"));
 
     let validPaymentFound = false;
     for (const log of receipt.logs) {
@@ -63,6 +63,8 @@ export const createCryptoSubscription = async (txHash: string) => {
       }
 
       const parsedLog = byteTokenContract.interface.parseLog(log);
+      if (!parsedLog) continue;
+
       const toAddress = (parsedLog.args.to as string).toLowerCase();
       const amount = parsedLog.args.value as bigint;
 
@@ -78,6 +80,15 @@ export const createCryptoSubscription = async (txHash: string) => {
     if (!validPaymentFound) {
       throw new Error("Valid BYTE token payment to the shop wallet was not found in transaction logs");
     }
+    // Check if transaction hash has already been used
+    const existingTxHash = await db.query.userSubscription.findFirst({
+      where: eq(userSubscription.cryptoPaymentTxHash, txHash),
+    });
+
+    if (existingTxHash) {
+      throw new Error("This transaction hash has already been used for a subscription");
+    }
+
     // Check if user already has an active subscription
     const existingSubscription = await db.query.userSubscription.findFirst({
       where: eq(userSubscription.userId, userId),
@@ -90,15 +101,20 @@ export const createCryptoSubscription = async (txHash: string) => {
         cryptoPaymentTxHash: txHash,
         cryptoCurrentPeriodEnd: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days
         isCryptoSubscription: true,
+        // Clear Stripe fields for crypto
+        stripeCustomerId: null,
+        stripeSubscriptionId: null,
+        stripePriceId: null,
+        stripeCurrentPeriodEnd: null,
       }).where(eq(userSubscription.userId, userId));
     } else {
       // Create new subscription
       await db.insert(userSubscription).values({
         userId,
-        stripeCustomerId: `crypto_${userId}`, // Dummy stripe ID for crypto subs
-        stripeSubscriptionId: `crypto_${txHash}`,
-        stripePriceId: 'crypto_monthly',
-        stripeCurrentPeriodEnd: new Date(), // Not used for crypto
+        stripeCustomerId: null,
+        stripeSubscriptionId: null,
+        stripePriceId: null,
+        stripeCurrentPeriodEnd: null,
         cryptoSubscriptionId: txHash,
         cryptoPaymentTxHash: txHash,
         cryptoCurrentPeriodEnd: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days

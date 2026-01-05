@@ -74,7 +74,6 @@ export default async function Shop() {
           <SubscriptionCard
             isActive={subscriptionStatus.isActive}
             isCryptoSubscription={subscriptionStatus.isCryptoSubscription}
-            subscriptionType={subscriptionStatus.subscriptionType}
           />
         </div>
       </div>

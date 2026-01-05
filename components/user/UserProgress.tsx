@@ -5,14 +5,13 @@ import { getLevelFromPoints } from '@/config/levels'
 import { getUserProgress, getUserSubscription } from '@/db/queries/userProgress'
 
 type UserProgressProps = {
-  hasActiveSubscription?: boolean
   plain?: boolean
 }
 
-export async function UserProgress({ hasActiveSubscription, plain }: UserProgressProps) {
+export async function UserProgress({ plain }: UserProgressProps) {
   const userProgress = await getUserProgress()
   const userSubscription = await getUserSubscription()
-  const subscriptionActive = hasActiveSubscription ?? userSubscription?.isActive ?? false
+  const subscriptionActive = userSubscription?.isActive ?? false
   const { points = 0, hearts = 0, activeCourse } = userProgress ?? {}
   const { level, title: levelTitle } = getLevelFromPoints(points)
   const { title = 'Select course', altCode } = activeCourse ?? {}

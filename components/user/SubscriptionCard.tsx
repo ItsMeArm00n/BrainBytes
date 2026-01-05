@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useTransition } from 'react'
+import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -21,6 +22,7 @@ interface SubscriptionCardProps {
 export function SubscriptionCard({ isActive, isCryptoSubscription }: SubscriptionCardProps) {
   const [isPending, startTransition] = useTransition()
   const [isLoading, setIsLoading] = useState(false)
+  const router = useRouter()
 
   const handleStripeSubscription = async () => {
     setIsLoading(true)
@@ -74,7 +76,7 @@ export function SubscriptionCard({ isActive, isCryptoSubscription }: Subscriptio
 
         if (result.success) {
           toast.success(result.message)
-          window.location.reload() // Refresh to show updated status
+          router.refresh() // Refresh to show updated status
         } else {
           toast.error("Failed to activate subscription")
         }
